@@ -1,12 +1,11 @@
 import 'dart:convert';
-
 import 'package:csv/csv.dart';
 import 'package:xml/xml.dart';
 import 'package:flutter/foundation.dart';
 
 class FileParser {
   final String filename;
-  final List<int> filebytes;
+  final List<int>? filebytes;
 
   const FileParser({required this.filename, required this.filebytes});
 
@@ -83,7 +82,15 @@ class FileParser {
   }
 
   Future<List<Map<String, dynamic>>> parseFile() async {
-    final fileContent = String.fromCharCodes(filebytes);
+    // Ensure filebytes is not null
+    if (filebytes == null || filebytes!.isEmpty) {
+      if (kDebugMode) {
+        print("No file content available.");
+      }
+      return [];
+    }
+
+    final fileContent = String.fromCharCodes(filebytes!);
 
     try {
       if (filename.endsWith('.csv')) {

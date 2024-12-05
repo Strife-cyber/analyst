@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
@@ -20,6 +23,24 @@ class DatabaseHelper {
   // This method will be called when the database is created
   Future<void> _onCreate(Database db, int version) async {
     // You can predefine some initial tables if needed
+  }
+
+  Future<List<String>> getAllTableNames() async {
+    final db = await database;
+    final result = await db
+        .rawQuery('SELECT name FROM sqlite_master WHERE type = "table"');
+    return result.map((table) => table['name'] as String).toList();
+  }
+
+  // Fetch all JSON file names from the "datasets" folder
+  Future<List<String>> getAllJsonFileNames() async {
+    final directory = await getApplicationDocumentsDirectory();
+    final datasetsDirectory = Directory('${directory.path}/datasets');
+    final datasetFiles = datasetsDirectory
+        .listSync()
+        .where((file) => file is File && file.path.endsWith('.json'))
+        .toList();
+    return datasetFiles.map((file) => file.uri.pathSegments.last).toList();
   }
 
   // Create a table dynamically

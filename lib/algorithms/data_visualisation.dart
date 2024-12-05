@@ -10,42 +10,65 @@ class DataVisualisation extends StatelessWidget {
   final String? categoryField;
   final ChartType chartType;
 
-  const DataVisualisation(
-      {super.key,
-      required this.dataset,
-      required this.xField,
-      required this.yField,
-      this.categoryField,
-      required this.chartType});
+  const DataVisualisation({
+    super.key,
+    required this.dataset,
+    required this.xField,
+    required this.yField,
+    this.categoryField,
+    required this.chartType,
+  });
 
   Widget _buildBarChart() {
     List<BarChartGroupData> barData = dataset.map((item) {
-      return BarChartGroupData(x: item[xField], barRods: [
-        BarChartRodData(
-            toY: item[yField].toDouble(), color: Colors.blue, width: 20)
-      ]);
+      final xValue = item[xField];
+      final yValue = item[yField];
+
+      if (xValue is int && yValue is num) {
+        return BarChartGroupData(
+          x: xValue,
+          barRods: [
+            BarChartRodData(
+              toY: yValue.toDouble(),
+              color: Colors.blue,
+              width: 20,
+            ),
+          ],
+        );
+      }
+      return BarChartGroupData(x: 0, barRods: []); // Fallback for invalid data
     }).toList();
 
-    return BarChart(BarChartData(
+    return BarChart(
+      BarChartData(
         borderData: FlBorderData(show: false),
         titlesData: const FlTitlesData(show: true),
         gridData: const FlGridData(show: true),
-        barGroups: barData));
+        barGroups: barData,
+      ),
+    );
   }
 
   Widget _buildLineChart() {
-    List<LineChartBarData> lineData = [
-      LineChartBarData(
-          spots: dataset.map((item) {
-            return FlSpot(item[xField].toDouble(), item[yField].toDouble());
-          }).toList(),
-          isCurved: true,
-          color: Colors.green),
-    ];
+    List<FlSpot> spots = dataset.map((item) {
+      final xValue = item[xField];
+      final yValue = item[yField];
+
+      if (xValue is num && yValue is num) {
+        return FlSpot(xValue.toDouble(), yValue.toDouble());
+      }
+      return const FlSpot(0, 0); // Fallback for invalid data
+    }).toList();
 
     return LineChart(
       LineChartData(
-        lineBarsData: lineData,
+        lineBarsData: [
+          LineChartBarData(
+            spots: spots,
+            isCurved: true,
+            color: Colors.green,
+          ),
+        ],
         titlesData: const FlTitlesData(show: true),
         gridData: const FlGridData(show: true),
       ),
@@ -54,7 +77,13 @@ class DataVisualisation extends StatelessWidget {
 
   Widget _buildScatterPlot() {
     List<ScatterSpot> scatterData = dataset.map((item) {
-      return ScatterSpot(item[xField].toDouble(), item[yField].toDouble());
+      final xValue = item[xField];
+      final yValue = item[yField];
+
+      if (xValue is num && yValue is num) {
+        return ScatterSpot(xValue.toDouble(), yValue.toDouble());
+      }
+      return ScatterSpot(0, 0); // Fallback for invalid data
     }).toList();
 
     return ScatterChart(
@@ -65,7 +94,7 @@ class DataVisualisation extends StatelessWidget {
     );
   }
 
-  Widget _buildChart(List<Map<String, dynamic>> data) {
+  Widget _buildChart() {
     switch (chartType) {
       case ChartType.bar:
         return _buildBarChart();
@@ -87,7 +116,10 @@ class DataVisualisation extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            _buildChart(dataset),
+            SizedBox(
+              height: 400, // Set a fixed height for the chart
+              child: _buildChart(),
+            ),
           ],
         ),
       ),
