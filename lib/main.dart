@@ -1,4 +1,6 @@
+import 'package:analyst/pages/dataset_interaction_page.dart';
 import 'package:analyst/pages/dataset_upload_page.dart';
+import 'package:analyst/pages/dataset_view_page.dart';
 import 'package:analyst/pages/home_page.dart';
 import 'package:flutter/material.dart';
 
@@ -10,9 +12,9 @@ void main() {
       routes: {
         '/upload': (context) => const Scaffold(body: DatasetUploadPage()),
         '/open': (context) =>
-            const Scaffold(body: Center(child: Text('Open Dataset Page'))),
+            const Scaffold(body: Center(child: DatasetInteractionPage())),
         '/saved': (context) =>
-            const Scaffold(body: Center(child: Text('Saved Datasets Page'))),
+            const Scaffold(body: Center(child: DatasetViewPage())),
         '/results': (context) =>
             const Scaffold(body: Center(child: Text('Algorithm Results Page'))),
       },
