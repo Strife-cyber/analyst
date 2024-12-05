@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:analyst/algorithms/data_cleaner.dart';
 
@@ -25,6 +26,9 @@ void main() {
       ];
 
       expect(cleaned, equals(expected));
+      if (kDebugMode) {
+        print(cleaned);
+      }
     });
 
     test('Remove Duplicates', () {
@@ -37,7 +41,8 @@ void main() {
       ];
 
       // Perform cleaning
-      final cleaned = DataCleaner.removeDuplicates(dataset, ["id", "name"]);
+      final cleaned =
+          DataCleaner.removeDuplicates(dataset, ["name", "age", "marks"]);
 
       // Expected dataset after removing duplicates
       final expected = [
@@ -48,6 +53,9 @@ void main() {
       ];
 
       expect(cleaned, equals(expected));
+      if (kDebugMode) {
+        print(cleaned);
+      }
     });
 
     test('Remove Outliers', () {
@@ -55,12 +63,13 @@ void main() {
         {"id": 1, "name": "John", "age": 18, "marks": 85},
         {"id": 2, "name": "Jane", "age": 20, "marks": 90},
         {"id": 3, "name": "John", "age": 18, "marks": 85},
-        {"id": 4, "name": "Doe", "age": 22, "marks": 45}, // Outlier (marks)
+        {"id": 4, "name": "Doe", "age": 22, "marks": 10}, // Outlier (marks)
         {"id": 5, "name": "Alice", "age": 20, "marks": 88},
+        {"id": 6, "name": "Cloud", "age": 35, "marks": 200}, // Outlier (marks)
       ];
 
       // Perform cleaning
-      final cleaned = DataCleaner.removeOutliers(dataset, "marks", 2.0);
+      final cleaned = DataCleaner.removeOutliers(dataset, "marks", 1.3);
 
       // Expected dataset after removing outliers
       final expected = [

@@ -4,9 +4,9 @@ class DataCleaner {
   /// Remove entries with missing (null) values in specific fields
   static List<Map<String, dynamic>> removeMissingData(
       List<Map<String, dynamic>> dataset, List<String> requiredFields) {
-    return dataset
-        .where((entry) => requiredFields.every((field) => entry[field] != null))
-        .toList();
+    return dataset.where((entry) {
+      return requiredFields.every((field) => entry[field] != null);
+    }).toList();
   }
 
   /// Removes duplicate entries based on specific unique fields.
@@ -16,7 +16,7 @@ class DataCleaner {
 
     return dataset.where((entry) {
       final key =
-          uniqueFields.map((field) => entry[field].toString()).join('-');
+          uniqueFields.map((field) => entry[field]?.toString()).join('-');
       if (seen.contains(key)) {
         return false;
       } else {
@@ -47,8 +47,8 @@ class DataCleaner {
     return dataset.where((entry) {
       final value = entry[numericalField];
       if (value is num) {
-        final zScore = (value - mean) / stdDev;
-        return zScore.abs() <= zThreshold;
+        final zScore = (value - mean).abs() / stdDev;
+        return zScore <= zThreshold;
       }
       return true;
     }).toList();
