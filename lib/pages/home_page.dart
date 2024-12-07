@@ -100,7 +100,7 @@ class _HomePageState extends State<HomePage>
                         textAlign: TextAlign.center,
                       ),
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 60),
                     // Animated Navigation Buttons
                     SlideTransition(
                       position: _slideAnimation,
@@ -132,15 +132,7 @@ class _HomePageState extends State<HomePage>
                             onTap: () {
                               Navigator.pushNamed(context, '/saved');
                             },
-                          ),
-                          buildButton(
-                            context,
-                            icon: Icons.analytics,
-                            label: "Transform data",
-                            onTap: () {
-                              Navigator.pushNamed(context, '/results');
-                            },
-                          ),
+                          )
                         ],
                       ),
                     ),

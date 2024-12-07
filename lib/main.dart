@@ -10,13 +10,9 @@ void main() {
       debugShowCheckedModeBanner: false,
       home: const HomePage(),
       routes: {
-        '/upload': (context) => const Scaffold(body: DatasetUploadPage()),
-        '/open': (context) =>
-            const Scaffold(body: Center(child: DatasetInteractionPage())),
-        '/saved': (context) =>
-            const Scaffold(body: Center(child: DatasetViewPage())),
-        '/results': (context) =>
-            const Scaffold(body: Center(child: Text('Algorithm Results Page'))),
+        '/upload': (context) => const DatasetUploadPage(),
+        '/open': (context) => const DatasetInteractionPage(),
+        '/saved': (context) => const DatasetViewPage()
       },
     ),
   );

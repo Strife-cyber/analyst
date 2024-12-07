@@ -1,4 +1,5 @@
 import 'package:analyst/database/database_helper.dart';
+import 'package:analyst/pages/dataset_page.dart';
 import 'package:analyst/pages/sections/dataset_card.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -14,11 +15,15 @@ class _DatasetViewPageState extends State<DatasetViewPage> {
   final DatabaseHelper _dbHelper = DatabaseHelper();
   List<String> _datasetsFromDb = [];
   List<String> _datasetsFromFiles = [];
+  List<String> _filteredDbDatasets = [];
+  List<String> _filteredFileDatasets = [];
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _loadDatasets();
+    _searchController.addListener(_filterDatasets);
   }
 
   Future<void> _loadDatasets() async {
@@ -29,15 +34,42 @@ class _DatasetViewPageState extends State<DatasetViewPage> {
     setState(() {
       _datasetsFromDb = dbTableNames;
       _datasetsFromFiles = fileNames;
+      _filteredDbDatasets = dbTableNames;
+      _filteredFileDatasets = fileNames;
     });
   }
 
-  // Optionally, add a function to open a dataset, delete or export
+  // Function to filter datasets based on search query
+  void _filterDatasets() {
+    final query = _searchController.text.toLowerCase();
+
+    setState(() {
+      _filteredDbDatasets = _datasetsFromDb
+          .where((dataset) => dataset.toLowerCase().contains(query))
+          .toList();
+      _filteredFileDatasets = _datasetsFromFiles
+          .where((dataset) => dataset.toLowerCase().contains(query))
+          .toList();
+    });
+  }
+
+  // Function to handle opening a dataset (can navigate to a different page or display data)
   void _openDataset(String datasetName) {
-    // Implement logic to open the dataset, could be a new page to view the data
+    // Implement logic to open dataset
     if (kDebugMode) {
       print("Opening dataset: $datasetName");
     }
+
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => DatasetPage(datasetName: datasetName)));
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   @override
@@ -50,18 +82,40 @@ class _DatasetViewPageState extends State<DatasetViewPage> {
       body: SafeArea(
         child: Column(
           children: [
-            // Search Bar and Filters can go here
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              child: TextField(
+                controller: _searchController,
+                decoration: InputDecoration(
+                  hintText: 'Search datasets...',
+                  prefixIcon: const Icon(Icons.search),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
+                  filled: true,
+                  fillColor: Colors.white,
+                ),
+              ),
+            ),
 
             // Datasets from Database
             Expanded(
               child: ListView.builder(
-                itemCount: _datasetsFromDb.length,
+                itemCount: _filteredDbDatasets.length,
                 itemBuilder: (context, index) {
-                  final datasetName = _datasetsFromDb[index];
-                  return DatasetCard(
-                    datasetName: datasetName,
-                    onOpen: () => _openDataset(datasetName),
-                    isTable: true,
+                  final datasetName = _filteredDbDatasets[index];
+                  return AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    child: DatasetCard(
+                      key: ValueKey(datasetName),
+                      datasetName: datasetName,
+                      onOpen: () => _openDataset(datasetName),
+                      isTable: true,
+                      onDelete: () {
+                        setState(() {});
+                      },
+                    ),
                   );
                 },
               ),
@@ -70,13 +124,20 @@ class _DatasetViewPageState extends State<DatasetViewPage> {
             // Datasets from Files (JSON)
             Expanded(
               child: ListView.builder(
-                itemCount: _datasetsFromFiles.length,
+                itemCount: _filteredFileDatasets.length,
                 itemBuilder: (context, index) {
-                  final datasetName = _datasetsFromFiles[index];
-                  return DatasetCard(
-                    datasetName: datasetName,
-                    onOpen: () => _openDataset(datasetName),
-                    isTable: false,
+                  final datasetName = _filteredFileDatasets[index];
+                  return AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    child: DatasetCard(
+                      key: ValueKey(datasetName),
+                      datasetName: datasetName,
+                      onOpen: () => _openDataset(datasetName),
+                      isTable: false,
+                      onDelete: () {
+                        setState(() {});
+                      },
+                    ),
                   );
                 },
               ),
