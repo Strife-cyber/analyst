@@ -1,17 +1,13 @@
 import 'package:analyst/algorithms/data_aggregator.dart';
 import 'package:analyst/algorithms/data_cleaner.dart';
 import 'package:analyst/algorithms/data_scaler.dart';
-import 'package:analyst/pages/sections/algorithms_data.dart';
-import 'package:flutter/material.dart';
-import 'dart:convert'; // For JSON parsing
-// For math operations
-import 'package:flutter/services.dart'; // For loading JSON from assets
-
-import 'package:analyst/database/database_helper.dart';
 import 'package:analyst/pages/sections/algorithm_selector.dart';
+import 'package:analyst/pages/sections/algorithms_data.dart';
 import 'package:analyst/pages/sections/dataset_selector.dart';
 import 'package:analyst/pages/sections/dataset_table.dart';
 import 'package:analyst/pages/sections/save_results.dart';
+import 'package:analyst/pages/widgets/dataset_loader.dart';
+import 'package:flutter/material.dart';
 
 class DatasetInteractionPage extends StatefulWidget {
   const DatasetInteractionPage({super.key});
@@ -35,25 +31,23 @@ class _DatasetInteractionPageState extends State<DatasetInteractionPage> {
       ),
       body: SafeArea(
         child: selectedDataset == null
-            ? DatasetSelector(
-                onDatasetSelected: (datasetName) async {
-                  List<Map<String, dynamic>> loadedDataset =
-                      await loadDataset(datasetName);
-                  setState(() {
-                    selectedDataset = datasetName;
-                    dataset = loadedDataset;
-                  });
-                },
-              )
+            ? DatasetSelector(onDatasetSelected: (datasetName) async {
+                List<Map<String, dynamic>> loadedDataset =
+                    await loadDataset(datasetName);
+                setState(() {
+                  selectedDataset = datasetName;
+                  dataset = loadedDataset;
+                  results = dataset;
+                });
+              })
             : SingleChildScrollView(
                 child: Column(
                   children: [
                     AlgorithmSelector(
-                      algorithms: algorithmsUsed,
-                      onAlgorithmSelected: (algorithmName) {
-                        showParametersDialog(algorithmName);
-                      },
-                    ),
+                        algorithms: algorithmsUsed,
+                        onAlgorithmSelected: (algorithmName) {
+                          showParametersDialog(algorithmName);
+                        }),
                     DatasetJsonTree(dataset: results),
                     SaveResultsButton(results: results),
                   ],
@@ -61,23 +55,6 @@ class _DatasetInteractionPageState extends State<DatasetInteractionPage> {
               ),
       ),
     );
-  }
-
-  /// Loads the dataset dynamically based on the selected name
-  Future<List<Map<String, dynamic>>> loadDataset(String datasetName) async {
-    try {
-      if (datasetName.endsWith('.json')) {
-        String jsonString =
-            await rootBundle.loadString('assets/datasets/$datasetName');
-        return List<Map<String, dynamic>>.from(json.decode(jsonString));
-      } else {
-        DatabaseHelper dbHelper = DatabaseHelper();
-        return await dbHelper.fetchData(datasetName);
-      }
-    } catch (e) {
-      debugPrint('Error loading dataset: $e');
-      return [];
-    }
   }
 
   /// Prompts the user for algorithm parameters and executes the selected algorithm

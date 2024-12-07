@@ -41,34 +41,5 @@ const List<Map<String, String>> algorithmsUsed = [
     'steps': 'Z-Score Standardization',
     'example':
         'Normalize the "price" field of a meal dataset so that all prices are between 0 and 1.',
-  },
-  {
-    'name': 'Clustering Algorithms (e.g., K-Means)',
-    'purpose':
-        'Group similar data points into clusters based on certain features.',
-    'function':
-        'Divide the dataset into distinct groups that share similar properties.',
-    'steps': '1. K-Means Clustering\n2. DBSCAN',
-    'example':
-        'For a meal dataset, use K-Means to group meals based on their nutritional values (calories, fat content, etc.).',
-  },
-  {
-    'name': 'Association Rule Mining (Apriori Algorithm)',
-    'purpose':
-        'Discover interesting relationships between variables in large datasets, typically for market basket analysis.',
-    'function': 'Identify common co-occurrences of items in datasets.',
-    'steps':
-        '1. Generate Association Rules\n2. Measure Support, Confidence, Lift',
-    'example':
-        'In a meal dataset, find associations like "users who order pizza also order garlic bread" or "vegetarian meals are often paired with salads".',
-  },
-  {
-    'name': 'Visualization Algorithms',
-    'purpose':
-        'Generate visual representations of data to help users understand complex patterns and trends.',
-    'function': 'Convert raw data into insightful visualizations.',
-    'steps': '1. Charts and Graphs\n2. Heatmaps\n3. Scatter Plots',
-    'example':
-        'For a meal dataset, use bar charts to show the number of meals sold by category or line charts to show sales trends over time.',
-  },
+  }
 ];

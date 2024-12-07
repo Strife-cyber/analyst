@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class AlgorithmSelector extends StatelessWidget {
+class AlgorithmSelector extends StatefulWidget {
   final List<Map<String, String>> algorithms;
   final Function(String) onAlgorithmSelected;
 
@@ -11,36 +11,60 @@ class AlgorithmSelector extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    String? selectedAlgorithm;
+  State<AlgorithmSelector> createState() => _AlgorithmSelectorState();
+}
 
-    return StatefulBuilder(
-      builder: (context, setState) {
-        return Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Row(
+class _AlgorithmSelectorState extends State<AlgorithmSelector> {
+  String? selectedAlgorithm;
+  bool isLoading = false; // To track loading state
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        children: [
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Algorithm:',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.green[400],
+                ),
               ),
               Container(
-                width: 220,
-                height: 40,
+                width: 200,
+                height: 50,
                 decoration: BoxDecoration(
-                    color: Colors.grey[100],
-                    border: Border.all(color: Colors.green[200]!),
-                    borderRadius: BorderRadius.circular(8.0)),
+                  gradient: LinearGradient(
+                    colors: [Colors.green[100]!, Colors.green[600]!],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(12.0),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 6.0,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: DropdownButton<String>(
                     value: selectedAlgorithm,
                     hint: const Padding(
-                      padding: EdgeInsets.only(left: 8.0),
+                      padding: EdgeInsets.only(left: 12.0),
                       child: Text('Choose an algorithm'),
                     ),
-                    items: algorithms.map((algorithm) {
+                    dropdownColor: Colors.green[100],
+                    style: const TextStyle(
+                        color: Colors.black26, fontWeight: FontWeight.bold),
+                    items: widget.algorithms.map((algorithm) {
                       return DropdownMenuItem<String>(
                         value: algorithm['name'],
                         child: Text(algorithm['name']!),
@@ -51,7 +75,8 @@ class AlgorithmSelector extends StatelessWidget {
                         selectedAlgorithm = value;
                       });
                       if (value != null) {
-                        _showAlgorithmDetails(context, value, algorithms);
+                        _showAlgorithmDetails(
+                            context, value, widget.algorithms);
                       }
                     },
                   ),
@@ -59,8 +84,15 @@ class AlgorithmSelector extends StatelessWidget {
               ),
             ],
           ),
-        );
-      },
+          if (isLoading) // Show the circular progress indicator when loading
+            const Padding(
+              padding: EdgeInsets.only(top: 20.0),
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.greenAccent),
+              ),
+            ),
+        ],
+      ),
     );
   }
 
@@ -78,7 +110,12 @@ class AlgorithmSelector extends StatelessWidget {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text(algorithmDetails['name']!),
+          backgroundColor: Colors.deepPurple[50],
+          title: Text(
+            algorithmDetails['name']!,
+            style: TextStyle(
+                color: Colors.deepPurple[800], fontWeight: FontWeight.bold),
+          ),
           content: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -93,19 +130,38 @@ class AlgorithmSelector extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: Colors.red),
+              ),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                onAlgorithmSelected(algorithmDetails['name']!);
+                _onAlgorithmValidated();
+                widget.onAlgorithmSelected(algorithmDetails['name']!);
               },
-              child: const Text('Validate'),
+              child:
+                  const Text('Validate', style: TextStyle(color: Colors.green)),
             ),
           ],
         );
       },
     );
+  }
+
+  // Method to handle algorithm validation and show loading indicator
+  void _onAlgorithmValidated() {
+    setState(() {
+      isLoading = true;
+    });
+
+    // Simulate a 10s process (for example, algorithm calculation)
+    Future.delayed(const Duration(seconds: 3), () {
+      setState(() {
+        isLoading = false; // Stop loading after 10 seconds
+      });
+    });
   }
 
   /// Helper to build each detail row
@@ -117,10 +173,13 @@ class AlgorithmSelector extends StatelessWidget {
         children: [
           Text(
             title,
-            style: const TextStyle(fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.deepPurple[700],
+            ),
           ),
           const SizedBox(height: 4.0),
-          Text(content ?? 'N/A'),
+          Text(content ?? 'N/A', style: const TextStyle(color: Colors.black87)),
         ],
       ),
     );
